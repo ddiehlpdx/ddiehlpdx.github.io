@@ -112,11 +112,17 @@ button {
 /* MEDIA QUERIES */
 
 @media(max-width: 767px) {
-	.navbar-collapse {
-		background-color: rgba(0, 0, 0, .9);
+	.btn-lg {
+		margin: 2%;
 	}
 	#jumbo-text {
 		text-align: center !important;
+	}
+}
+
+@media(max-width: 575px) {
+	.navbar-collapse {
+		background-color: rgba(0, 0, 0, .9);
 	}
 }
 
