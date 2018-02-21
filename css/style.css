@@ -3,24 +3,15 @@
 body {
 	color: ghostwhite;
 	font-family: quicksand, ubuntu, "Work Sans", sans-serif;
-	height: 100%;
-	background-image: url(../images/coffeeandcode3.jpg);
-	background-position: center;
+	background-image: url(../images/cleanwhitebg3.jpg);
 	background-attachment: fixed;
 	background-repeat: no-repeat;
-	background-size: 100% auto;
+	background-size: cover;
 	overflow-x: hidden;
-}
-
-button {
-	margin: 1em;
-	display: inline-block;
 }
 
 h3 {
 	color: rgb(0, 0, 0);
-	size: 12px;
-	font-weight: 500px;
 	margin-top: .5em;
 }
 
@@ -39,7 +30,7 @@ section {
 footer {
 	height: 3em;
 	background-color: rgba(0, 0, 0, .9);
-	margin-top: 10px;
+	margin-top: 50px;
 	border-radius: 5px 20px 0 0;
 	padding: 1em;
 	font-variant: small-caps;
@@ -54,7 +45,6 @@ footer {
 .btn-display {
 	font-size: 14px;
 	font-family: quicksand, ubuntu, "Work Sans", sans-serif;
-	font-weight: 300;
 }
 
 .layover {
@@ -78,7 +68,9 @@ footer {
 
 .btn-static {
 	background-color: rgba(255, 255, 255, .9) !important;
-	
+	margin-right: 2em;
+	margin-top: 1em;
+	font-weight: 700;
 }
 
 .btn-static:hover {
@@ -190,8 +182,6 @@ footer {
 
 .navbar-light {
 	font-variant: small-caps;
-	font-size: 1.25em;
-	font-weight: 700;
 }
 
 .navbar-collapse {
@@ -203,6 +193,7 @@ footer {
 }
 
 .btn-light {
+	color: rgb(0, 0, 0) !important;
 	background: none;
 	border-radius: 5px 15px 5px 15px;
 	border: 1px solid rgba(0, 0, 0, .9);
@@ -211,10 +202,11 @@ footer {
 	box-shadow: 2px 2px 5px rgba(0, 0, 0, .9);
 }
 
-.btn-light:hover, .btn-light:focus, .btn-light:active {
+.btn-light:hover, .btn-light:active {
 	background: rgba(0, 0, 0, .9);
-	color: ghostwhite;
+	color: ghostwhite !important;
 	transform: scale(1.1);
+	-webkit-filter: blur(0);
 }
 
 .clearfix:after,
@@ -260,6 +252,7 @@ footer {
 	.btn-lg {
 		margin: 2%;
 	}
+
 	#jumbo-text {
 		text-align: center !important;
 	}
