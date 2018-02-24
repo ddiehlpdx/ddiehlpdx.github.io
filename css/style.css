@@ -3,7 +3,7 @@
 body {
 	color: ghostwhite;
 	font-family: quicksand, ubuntu, "Work Sans", sans-serif;
-	background-image: url(../images/cleanwhitebg3.jpg);
+	background-image: url(../images/polybg.jpg);
 	background-attachment: fixed;
 	background-repeat: no-repeat;
 	background-size: cover;
@@ -131,8 +131,6 @@ footer {
 	border-radius: 10px;
 	cursor: pointer;
 }
-
-
 
 .photo-overlay:hover {
 	opacity: 1;
@@ -270,5 +268,3 @@ footer {
 		margin: 10px auto;
 	}
 }
-
-
