@@ -49,6 +49,7 @@ p {
 	border-radius: 5px 25px 5px 25px !important;
 	margin: 0 auto;
 	background: rgba(0, 0, 0, .45) !important;
+	position: relative;
 }
 
 .btn:hover {
@@ -284,11 +285,7 @@ p {
 	footer {
 		height: 25%;
 	}
-/*
-	.flex-container {
-		display: block;
-	}
-*/	
+	
 	.jumbotron {
 		height: 75%;
 	}
@@ -320,5 +317,17 @@ p {
 	
 	#skills {
 		height: 80%;
+	}
+}
+
+@media (max-height: 650px) {
+	#circle1 {
+		display: none !important;
+	}
+}
+
+@media (max-height: 516px) {
+	#circle2 {
+		display: none !important;
 	}
 }
