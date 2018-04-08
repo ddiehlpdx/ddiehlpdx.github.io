@@ -1,6 +1,5 @@
 /* HTML ELEMENTS */
 
-
 a {
 	color: inherit !important;
 }
@@ -306,6 +305,10 @@ p {
 	
 	#bio-box {
 		height: 55%;
+	}
+	
+	#landing-bar {
+		display: block;
 	}
 	
 	#portfolio {
