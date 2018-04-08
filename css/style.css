@@ -1,7 +1,15 @@
 /* HTML ELEMENTS */
 
+::-webkit-scrollbar { 
+    display: none; 
+}
+
 a {
 	color: inherit !important;
+}
+
+::-webkit-scrollbar { 
+    display: none; 
 }
 
 body {
@@ -39,8 +47,7 @@ p {
 
 .btn {
 	border-radius: 5px 25px 5px 25px !important;
-	margin-left: 150px;
-	margin-right: 150px;
+	margin: 0 auto;
 	background: rgba(0, 0, 0, .45) !important;
 }
 
@@ -220,7 +227,7 @@ p {
 /* DIRECT ID TARGETS */
 
 #bio-box {
-	height: 55vh;
+	height: 60vh;
 }
 
 #circle1 {
@@ -273,19 +280,15 @@ p {
 	overflow-x: hidden;
 }
 
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgb(15, 15, 30);; 
-}
-
-@media only screen and (max-width: 1072px) {
+@media (max-width: 1352px) {
 	footer {
 		height: 25%;
 	}
-	
+/*
+	.flex-container {
+		display: block;
+	}
+*/	
 	.jumbotron {
 		height: 75%;
 	}
@@ -303,12 +306,12 @@ p {
 		margin-top: 18%;
 	}
 	
-	#bio-box {
-		height: 55%;
+	#landing-bar {
+		display: block !important;
 	}
 	
-	#landing-bar {
-		display: block;
+	#bio-box {
+		height: 55%;
 	}
 	
 	#portfolio {
