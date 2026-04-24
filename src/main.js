@@ -100,10 +100,6 @@ class Application {
             // Initialize text system
             textSystem = new TextSystem();
 
-            // Initialize audio system (requires user interaction)
-            audioSystem = new AudioSystem();
-            await audioSystem.init();
-
             // Initialize puzzle system
             puzzleSystem = new PuzzleSystem();
 
@@ -123,6 +119,10 @@ class Application {
             this.initialized = true;
             console.log('Diamond Eater initialized');
             console.log('Current stage:', stateManager.currentStage);
+
+            // Initialize audio in background (don't block - Tone.start() can hang on mobile)
+            audioSystem = new AudioSystem();
+            audioSystem.init();
         } catch (error) {
             console.error('Failed to initialize Diamond Eater:', error);
             alert('Initialization failed. Check console for details.');
