@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>◆</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <!-- Initial prompt for audio initiation -->
+    <div id="init-prompt" class="init-prompt">
+        <img src="assets/images/logo-tb.png" alt="begin">
+    </div>
+
+    <!-- Canvas for text rendering -->
+    <canvas id="text-canvas"></canvas>
+
+    <!-- Three.js container for visual effects -->
+    <div id="visual-container"></div>
+
+    <!-- Puzzle discovery messages -->
+    <div id="message-container"></div>
+
+    <!-- QR code reveal container -->
+    <div id="qr-container" class="hidden"></div>
+
+    <!-- Load libraries from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- Core systems -->
+    <script src="src/core/StateManager.js"></script>
+    <script src="src/core/StageManager.js"></script>
+    <script src="src/core/ScrollEngine.js"></script>
+
+    <!-- Utility modules -->
+    <script src="src/utils/TextCorruption.js"></script>
+    <script src="src/utils/ClickDetection.js"></script>
+
+    <!-- Systems -->
+    <script src="src/systems/TextSystem.js"></script>
+    <script src="src/systems/VisualLayer.js"></script>
+    <script src="src/systems/AudioSystem.js"></script>
+    <script src="src/systems/PuzzleSystem.js"></script>
+
+    <!-- Effects -->
+    <script src="src/effects/GlitchEffect.js"></script>
+    <script src="src/effects/SurveillanceEffect.js"></script>
+    <script src="src/effects/TemporalEffect.js"></script>
+    <script src="src/effects/VoidEffect.js"></script>
+
+    <!-- Main application -->
+    <script src="src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: 'Courier New', monospace;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+/* Initial prompt */
+.init-prompt {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 1000;
+    font-size: 14px;
+    color: #666;
+    letter-spacing: 2px;
+    text-transform: lowercase;
+    transition: opacity 0.5s ease;
+}
+
+.init-prompt.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.init-prompt img {
+    max-width: 160px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    filter: drop-shadow(2px 0 0 rgba(255, 0, 0, 0.3))
+            drop-shadow(-2px 0 0 rgba(0, 255, 255, 0.3));
+    animation: logoBreathe 6s ease-in-out infinite;
+    will-change: transform, filter;
+}
+
+@keyframes logoBreathe {
+    0%, 100% {
+        transform: scale(0.98);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+}
+
+/* Text canvas - covers entire viewport */
+#text-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Visual effects container (Three.js) */
+#visual-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+#visual-container canvas {
+    display: block;
+}
+
+/* Message container for puzzle discoveries */
+#message-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    text-align: center;
+    pointer-events: none;
+}
+
+.discovery-message {
+    font-size: 18px;
+    color: #ffffff;
+    letter-spacing: 3px;
+    text-transform: lowercase;
+    animation: messageAppear 3s ease-out forwards;
+}
+
+@keyframes messageAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    10% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    90% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.2);
+    }
+}
+
+.completion-message {
+    font-size: 24px;
+    color: #ff0000;
+    letter-spacing: 4px;
+    text-transform: lowercase;
+    margin-top: 20px;
+}
+
+/* QR code reveal */
+#qr-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 200;
+    text-align: center;
+    transition: opacity 0.5s ease;
+}
+
+#qr-container.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* QR code wrapper - optimize for GSAP animations */
+#qr-code {
+    will-change: filter, transform, opacity;
+    transition: none; /* Prevent CSS transitions interfering with GSAP */
+}
+
+/* Message text - optimize for corruption updates */
+#qr-container p {
+    will-change: contents;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+    text-transform: lowercase;
+}
+
+.qr-reveal {
+    animation: qrReveal 2s ease-out forwards;
+}
+
+@keyframes qrReveal {
+    0% {
+        opacity: 0;
+        transform: scale(0) rotate(0deg);
+        filter: blur(20px);
+    }
+    50% {
+        filter: blur(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(360deg);
+        filter: blur(0px);
+    }
+}
+
+/* Utility classes */
+.hidden {
+    display: none;
+}
+
+/* Cursor variations for proximity hints */
+body.hint-nearby {
+    cursor: pointer;
+}
+
+/* Screen shake for glitch effects */
+.screen-shake {
+    animation: shake 0.2s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(-10px, 5px);
+    }
+    50% {
+        transform: translate(10px, -5px);
+    }
+    75% {
+        transform: translate(-5px, -10px);
+    }
+}
+
+/* Mobile zone hint pulses (progressive reveal) */
+.zone-hint-mobile {
+    position: fixed;
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0) 70%
+    );
+    pointer-events: none;
+    z-index: 50;
+    animation: zonePulse 2s ease-in-out infinite;
+    will-change: transform, opacity;
+}
+
+@keyframes zonePulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.15;
+    }
+    50% {
+        transform: scale(1.08);
+        opacity: 0.3;
+    }
+}
+
+/* Zone activation pulse (visible hint) */
+.zone-activation-pulse {
+    border-radius: 50%;
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform-origin: center;
+    will-change: transform, opacity;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Prevent text selection and tap highlights on mobile */
+@media (max-width: 768px) {
+    body {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+}
