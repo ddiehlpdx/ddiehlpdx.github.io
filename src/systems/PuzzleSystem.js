@@ -192,6 +192,14 @@ class PuzzleSystem {
             this.startPeriodicZoneFlash();
         }
 
+        // Check if we just entered stage 9 with all zones already discovered
+        if (this.currentStage === 9 && this.discoveredZones.size === this.totalZones) {
+            const container = document.getElementById('qr-container');
+            if (container.classList.contains('hidden')) {
+                setTimeout(() => this.revealQRCode(), 1000);
+            }
+        }
+
         console.log(`PuzzleSystem: Stage ${this.currentStage}, ${this.activeZones.length} active zones`);
     }
 
@@ -430,9 +438,8 @@ class PuzzleSystem {
             glitchEffect.trigger(0.7);
         }
 
-        // Check for completion
-        if (this.discoveredZones.size === this.totalZones) {
-            // Only reveal if not already revealed
+        // Check for completion - need ALL zones found AND at stage 9 (Revelation)
+        if (this.discoveredZones.size === this.totalZones && this.currentStage === 9) {
             const container = document.getElementById('qr-container');
             if (container.classList.contains('hidden')) {
                 setTimeout(() => this.revealQRCode(), 1000);
