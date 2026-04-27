@@ -34,27 +34,23 @@ class ScrollEngine {
         // Capture wheel events (desktop)
         window.addEventListener('wheel', (e) => {
             e.preventDefault();
-            this.handleScrollDelta(e.deltaY);
+            this.handleScrollDelta(e.deltaY * 0.5);
         }, { passive: false });
 
-        // Capture touch events (mobile)
-        let touchStart = 0;
-        let touchStartTime = 0;
+        // Capture touch events (mobile) - use incremental delta
+        let lastTouchY = 0;
 
         window.addEventListener('touchstart', (e) => {
-            touchStart = e.touches[0].clientY;
-            touchStartTime = Date.now();
+            lastTouchY = e.touches[0].clientY;
         }, { passive: true });
 
         window.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            const delta = touchStart - e.touches[0].clientY;
-            const touchTime = Date.now() - touchStartTime;
+            const currentY = e.touches[0].clientY;
+            const delta = lastTouchY - currentY; // Incremental since last move
+            lastTouchY = currentY;
 
-            // Calculate velocity for touch
-            const velocity = touchTime > 0 ? delta / touchTime : 0;
-
-            this.handleScrollDelta(delta * 0.5); // Scale down touch sensitivity
+            this.handleScrollDelta(delta * 0.5);
         }, { passive: false });
 
         // Prevent space bar and arrow key scrolling

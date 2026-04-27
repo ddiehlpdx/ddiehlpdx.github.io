@@ -171,9 +171,9 @@ class PuzzleSystem {
         // Track previously active zones
         const previousActiveZones = new Set(this.activeZones.map(z => z.id));
 
-        // Update active zones - only current stage zones are active
+        // Update active zones - zones are active at their stage and all later stages
         this.activeZones = this.zones.filter(zone =>
-            zone.stage === this.currentStage && !this.discoveredZones.has(zone.id)
+            zone.stage <= this.currentStage && !this.discoveredZones.has(zone.id)
         );
 
         // Find newly activated zones
