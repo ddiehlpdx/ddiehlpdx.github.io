@@ -542,21 +542,26 @@ class PuzzleSystem {
         // Apply initial corruption
         this.applyReverseDOMCorruption(mainText, 1.0);
 
-        // Create QR code
+        // Create QR code wrapped in clickable link
+        const qrLink = document.createElement('a');
+        qrLink.href = '/a-thesis/';
+        qrLink.style.position = 'absolute';
+        qrLink.style.top = '50%';
+        qrLink.style.left = '50%';
+        qrLink.style.transform = 'translate(-50%, -50%)';
+        qrLink.style.display = 'inline-block';
+        qrLink.style.textDecoration = 'none';
+        qrLink.style.zIndex = '1'; // Below message
+
         const qrWrapper = document.createElement('div');
         qrWrapper.id = 'qr-code';
-        qrWrapper.style.position = 'absolute';
-        qrWrapper.style.top = '50%';
-        qrWrapper.style.left = '50%';
-        qrWrapper.style.transform = 'translate(-50%, -50%)';
-        qrWrapper.style.display = 'inline-block';
         qrWrapper.style.padding = '20px';
         qrWrapper.style.background = 'linear-gradient(135deg, rgb(255, 0, 0) 0%, rgb(0, 255, 255) 100%)';
-        qrWrapper.style.zIndex = '1'; // Below message
-        container.appendChild(qrWrapper);
+        qrLink.appendChild(qrWrapper);
+        container.appendChild(qrLink);
 
         new QRCode(qrWrapper, {
-            text: 'https://example.com/diamond-eater-complete',
+            text: '/a-thesis/',
             width: 256,
             height: 256,
             colorDark: '#000000',
@@ -587,7 +592,7 @@ class PuzzleSystem {
         }, null, 1.5); // Execute at 1.5s mark
 
         // Phase 3: QR code scales in after flash (1.8-3.8s)
-        masterTimeline.fromTo(qrWrapper,
+        masterTimeline.fromTo(qrLink,
             { opacity: 0, scale: 0.5 },
             { opacity: 1, scale: 1, duration: 2, ease: 'back.out(1.7)' },
             1.8  // Start at 1.8s (after flash completes)
@@ -624,15 +629,21 @@ class PuzzleSystem {
         }
 
         // Step 4: Fade out original QR code very quickly as glyphs appear
-        gsap.to(qrWrapper, {
+        const qrLink = qrWrapper.parentElement;
+        gsap.to(qrLink, {
             opacity: 0,
             duration: 0.2,
             ease: 'power2.in',
             onComplete: () => {
-                qrWrapper.remove();
+                qrLink.remove();
                 console.log('Original QR removed, crumble continues');
             }
         });
+
+        // Step 4b: Inject "a thesis" into data stream
+        if (window.visualLayer) {
+            visualLayer.setPuzzleSolved();
+        }
 
         // Step 5: Fade message to faint visibility
         if (this.revealMessage) {

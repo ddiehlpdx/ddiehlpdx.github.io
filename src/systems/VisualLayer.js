@@ -42,6 +42,15 @@ class VisualLayer {
         this.crumbleGlyphs = null;
         this.crumbleStartTime = 0;
 
+        // Post-puzzle state
+        this.puzzleSolved = false;
+        this.lastThesisInject = 0;
+        this.thesisWord = ['a', ' ', 't', 'h', 'e', 's', 'i', 's'];
+
+        // Raycaster for thesis glyph click detection
+        this.raycaster = new THREE.Raycaster();
+        this.mouse = new THREE.Vector2();
+
         // Create effects - build up gradually
         this.createBackgroundGrid();
         this.createParticles();
@@ -55,6 +64,9 @@ class VisualLayer {
         window.addEventListener('stageChange', (e) => {
             this.onStageChange(e.detail);
         });
+
+        // Thesis glyph click/hover detection
+        this.setupThesisClickDetection();
 
         console.log('VisualLayer initialized successfully');
     }
@@ -334,6 +346,86 @@ class VisualLayer {
     }
 
     /**
+     * Mark puzzle as solved - starts injecting "a thesis" into data stream
+     */
+    setPuzzleSolved() {
+        this.puzzleSolved = true;
+        this.lastThesisInject = Date.now();
+        console.log('Puzzle solved - "a thesis" will now appear in data stream');
+    }
+
+    /**
+     * Setup click/touch detection for thesis glyphs in data stream
+     */
+    setupThesisClickDetection() {
+        const canvas = this.renderer.domElement;
+
+        // Helper: raycast and find thesis glyph under pointer
+        const getThesisGlyphAt = (clientX, clientY) => {
+            this.mouse.x = (clientX / window.innerWidth) * 2 - 1;
+            this.mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+            this.raycaster.setFromCamera(this.mouse, this.camera);
+
+            const intersects = this.raycaster.intersectObjects(this.scene.children);
+            for (const hit of intersects) {
+                if (hit.object.userData.isThesisGlyph &&
+                    hit.object.userData.protectedUntil &&
+                    Date.now() < hit.object.userData.protectedUntil) {
+                    return hit.object;
+                }
+            }
+            return null;
+        };
+
+        // Click — navigate to /a-thesis/
+        canvas.addEventListener('click', (e) => {
+            if (!this.puzzleSolved) return;
+            if (getThesisGlyphAt(e.clientX, e.clientY)) {
+                window.location.href = '/a-thesis/';
+            }
+        });
+
+        // Touch — navigate to /a-thesis/
+        canvas.addEventListener('touchend', (e) => {
+            if (!this.puzzleSolved) return;
+            const touch = e.changedTouches[0];
+            if (touch && getThesisGlyphAt(touch.clientX, touch.clientY)) {
+                window.location.href = '/a-thesis/';
+            }
+        });
+
+        // Hover — show pointer cursor over thesis glyphs
+        canvas.addEventListener('mousemove', (e) => {
+            if (!this.puzzleSolved) return;
+            canvas.style.cursor = getThesisGlyphAt(e.clientX, e.clientY) ? 'pointer' : 'default';
+        });
+    }
+
+    /**
+     * Inject "a thesis" vertically into a random data stream column
+     */
+    injectThesisIntoColumn() {
+        if (!this.dataStreamColumns || this.dataStreamColumns.length === 0) return;
+
+        // Pick a random column
+        const column = this.dataStreamColumns[Math.floor(Math.random() * this.dataStreamColumns.length)];
+        if (column.glyphs.length < this.thesisWord.length) return;
+
+        // Pick a random starting index, leaving room for the full word
+        const startIdx = Math.floor(Math.random() * (column.glyphs.length - this.thesisWord.length));
+
+        // Set consecutive glyphs to spell "a thesis" in white, protected from corruption
+        const protectUntil = Date.now() + 8000; // 8 seconds of protection
+        for (let i = 0; i < this.thesisWord.length; i++) {
+            const glyph = column.glyphs[startIdx + i];
+            this.updateGlyphChar(glyph, this.thesisWord[i], '#ffffff');
+            glyph.material.opacity = 0.6;
+            glyph.userData.protectedUntil = protectUntil;
+            glyph.userData.isThesisGlyph = true;
+        }
+    }
+
+    /**
      * Handle stage change
      */
     onStageChange(detail) {
@@ -571,6 +663,17 @@ class VisualLayer {
                         glyph.position.y = 12;
                     }
 
+                    // Skip corruption for protected thesis glyphs
+                    if (glyph.userData.protectedUntil) {
+                        if (Date.now() < glyph.userData.protectedUntil) {
+                            return; // Still protected, skip corruption
+                        }
+                        // Protection expired — clear flags and restore base color
+                        glyph.userData.protectedUntil = null;
+                        glyph.userData.isThesisGlyph = false;
+                        this.updateGlyphChar(glyph, glyph.userData.char, glyph.userData.baseColor);
+                    }
+
                     // Random corruption
                     const corruptChance = column.corruptionChance * (1 + this.intensity * 2);
                     if (Math.random() < corruptChance) {
@@ -593,6 +696,15 @@ class VisualLayer {
                     }
                 });
             });
+        }
+
+        // Inject "a thesis" vertically into data stream columns after puzzle solved
+        if (this.puzzleSolved) {
+            const now = Date.now();
+            if (now - this.lastThesisInject > 3000) {
+                this.injectThesisIntoColumn();
+                this.lastThesisInject = now;
+            }
         }
     }
 
@@ -647,6 +759,11 @@ class VisualLayer {
         if (this.dataStreamColumns) {
             this.dataStreamColumns.forEach(column => {
                 column.glyphs.forEach(glyph => {
+                    // Skip protected thesis glyphs
+                    if (glyph.userData.protectedUntil && Date.now() < glyph.userData.protectedUntil) {
+                        return;
+                    }
+
                     const original = glyph.material.opacity;
                     glyph.material.opacity = Math.min(original + intensity * 0.2, 0.8);
 
