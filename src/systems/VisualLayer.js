@@ -37,6 +37,7 @@ class VisualLayer {
         // State
         this.time = 0;
         this.intensity = 0.05;
+        this.lastCorruptionTime = 0;
 
         // QR crumble state
         this.crumbleGlyphs = null;
@@ -653,9 +654,13 @@ class VisualLayer {
 
         // Animate data stream columns
         if (this.dataStreamColumns) {
+            const now = Date.now();
+            const shouldCorrupt = now - this.lastCorruptionTime > 200;
+            if (shouldCorrupt) this.lastCorruptionTime = now;
+
             this.dataStreamColumns.forEach(column => {
                 column.glyphs.forEach(glyph => {
-                    // Scroll down
+                    // Scroll down (every frame — cheap position update)
                     glyph.position.y -= column.speed * deltaTime * 0.001;
 
                     // Wrap around
@@ -663,9 +668,12 @@ class VisualLayer {
                         glyph.position.y = 12;
                     }
 
+                    // Corruption only runs every 200ms to reduce texture uploads
+                    if (!shouldCorrupt) return;
+
                     // Skip corruption for protected thesis glyphs
                     if (glyph.userData.protectedUntil) {
-                        if (Date.now() < glyph.userData.protectedUntil) {
+                        if (now < glyph.userData.protectedUntil) {
                             return; // Still protected, skip corruption
                         }
                         // Protection expired — clear flags and restore base color
@@ -755,34 +763,42 @@ class VisualLayer {
             });
         }
 
-        // Flash data stream
+        // Flash data stream — cap texture updates to avoid iOS performance hit
         if (this.dataStreamColumns) {
+            // Collect all eligible glyphs, then pick a random subset for corruption
+            const eligible = [];
             this.dataStreamColumns.forEach(column => {
                 column.glyphs.forEach(glyph => {
-                    // Skip protected thesis glyphs
-                    if (glyph.userData.protectedUntil && Date.now() < glyph.userData.protectedUntil) {
-                        return;
-                    }
-
-                    const original = glyph.material.opacity;
-                    glyph.material.opacity = Math.min(original + intensity * 0.2, 0.8);
-
-                    // Burst of corruption
-                    if (Math.random() < 0.3) {
-                        const newChar = this.glyphPool[Math.floor(Math.random() * this.glyphPool.length)];
-                        const color = Math.random() < 0.5 ? '#ff0000' : '#00ffff';
-                        this.updateGlyphChar(glyph, newChar, color);
-                    }
-
-                    setTimeout(() => {
-                        glyph.material.opacity = original;
-                        // Restore base color
-                        if (glyph.userData.char) {
-                            this.updateGlyphChar(glyph, glyph.userData.char, glyph.userData.baseColor);
-                        }
-                    }, 100);
+                    if (glyph.userData.protectedUntil && Date.now() < glyph.userData.protectedUntil) return;
+                    eligible.push(glyph);
                 });
             });
+
+            // Opacity flash on all eligible (cheap — no texture upload)
+            eligible.forEach(glyph => {
+                const original = glyph.material.opacity;
+                glyph.material.opacity = Math.min(original + intensity * 0.2, 0.8);
+                setTimeout(() => { glyph.material.opacity = original; }, 100);
+            });
+
+            // Texture corruption on capped subset (~20 max)
+            const corruptCount = Math.min(20, Math.floor(eligible.length * 0.3));
+            for (let i = eligible.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [eligible[i], eligible[j]] = [eligible[j], eligible[i]];
+            }
+            for (let i = 0; i < corruptCount; i++) {
+                const glyph = eligible[i];
+                const newChar = this.glyphPool[Math.floor(Math.random() * this.glyphPool.length)];
+                const color = Math.random() < 0.5 ? '#ff0000' : '#00ffff';
+                this.updateGlyphChar(glyph, newChar, color);
+
+                setTimeout(() => {
+                    if (glyph.userData.char) {
+                        this.updateGlyphChar(glyph, glyph.userData.char, glyph.userData.baseColor);
+                    }
+                }, 100);
+            }
         }
     }
 }
