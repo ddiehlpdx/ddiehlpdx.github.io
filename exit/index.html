@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXIT INTERVIEW — FORM EI-7734</title>
+
+    <!-- Ensure trailing slash so relative paths resolve correctly -->
+    <script>
+        if (!window.location.pathname.endsWith('/') && !window.location.pathname.includes('.')) {
+            window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+        }
+    </script>
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { height: 100%; }
+        body {
+            min-height: 100%;
+            background-color: #e8e8e8;
+            color: #1a1a1a;
+            font-family: 'Times New Roman', Times, serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Init overlay */
+        #init-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: #e8e8e8;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        #init-overlay.dismissed {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+        .init-content {
+            text-align: center;
+            max-width: 500px;
+            padding: 20px;
+        }
+        .init-seal {
+            font-size: 36px;
+            color: #666;
+            margin-bottom: 12px;
+            line-height: 1;
+        }
+        .init-agency {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #555;
+        }
+        .init-divider {
+            width: 60%;
+            margin: 16px auto;
+            border: none;
+            border-top: 1px solid #999;
+        }
+        .init-title {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #333;
+            font-weight: bold;
+        }
+        .init-subtitle {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: #888;
+            margin-top: 4px;
+        }
+        .init-warning {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 11px;
+            color: #555;
+            line-height: 1.6;
+            text-align: justify;
+            margin: 20px auto;
+            max-width: 400px;
+            padding: 12px;
+            border: 1px solid #bbb;
+        }
+        .init-prompt {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #666;
+            margin-top: 20px;
+            animation: initPulse 3s ease-in-out infinite;
+        }
+        .init-classification {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 9px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #8b1a1a;
+            margin-top: 16px;
+        }
+        @keyframes initPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Glitch access sequence */
+        #init-overlay.denied { cursor: default; }
+        #init-overlay.denied .init-prompt {
+            color: #8b1a1a;
+            animation: none;
+            font-weight: bold;
+            letter-spacing: 6px;
+        }
+        #init-overlay.terminal {
+            background-color: #0a0a0a;
+        }
+        #init-overlay.terminal .init-content {
+            text-align: left;
+            font-family: 'Courier New', Courier, monospace;
+            color: #00ff41;
+            max-width: 440px;
+        }
+        .terminal-line {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            color: #00ff41;
+            line-height: 1.8;
+            white-space: pre;
+        }
+        .terminal-line.granted {
+            color: #33ff77;
+            font-weight: bold;
+        }
+        .terminal-cursor {
+            display: inline;
+            animation: cursorBlink 500ms step-end infinite;
+        }
+        @keyframes cursorBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        @keyframes shudder {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-2px); }
+            40% { transform: translateX(2px); }
+            60% { transform: translateX(-1px); }
+            80% { transform: translateX(1px); }
+            100% { transform: translateX(0); }
+        }
+        .init-shudder { animation: shudder 0.3s ease-out; }
+        .glitch-char {
+            position: absolute;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            color: #00ff41;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .terminal-input {
+            display: inline;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            color: #00ff41;
+            background: none;
+            border: none;
+            border-radius: 0;
+            outline: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            caret-color: #00ff41;
+            width: 2ch;
+            padding: 0;
+            margin: 0;
+            line-height: 1.8;
+            vertical-align: baseline;
+            box-shadow: none;
+        }
+        .scan-lines::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 65, 0.03) 2px,
+                rgba(0, 255, 65, 0.03) 4px
+            );
+            animation: scanMove 0.5s linear;
+            pointer-events: none;
+        }
+        @keyframes scanMove {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(100%); }
+        }
+
+        /* Form wrapper — hidden until init */
+        #form-wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 60px 80px;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        #form-wrapper.visible { opacity: 1; }
+
+        /* Debug overlay */
+        .debug-overlay {
+            position: fixed;
+            top: 10px; left: 10px;
+            background: rgba(0,0,0,0.85);
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            padding: 12px;
+            z-index: 9999;
+            max-width: 300px;
+            line-height: 1.5;
+            border: 1px solid #00ff00;
+        }
+        .hidden { display: none !important; }
+    </style>
+
+    <link rel="stylesheet" href="styles/form.css">
+</head>
+<body>
+    <!-- Init overlay -->
+    <div id="init-overlay">
+        <div class="init-content">
+            <div class="init-seal">&#9733;</div>
+            <div class="init-agency">Department of <span class="redacted-inline">████████████████</span></div>
+            <div class="init-divider"></div>
+            <div class="init-title">Secure Document Portal</div>
+            <div class="init-subtitle">Exit Processing System v2.7.4</div>
+            <div class="init-warning">
+                WARNING: This system is for authorized personnel only.
+                All activity is monitored and recorded. Unauthorized access
+                is a violation of <span class="redacted-inline">██████</span> &sect;7734
+                and may result in <span class="redacted-inline">████████████████████████</span>.
+            </div>
+            <div class="init-divider"></div>
+            <div class="init-prompt">Click to authenticate</div>
+            <div class="init-classification">Confidential &mdash; Internal Use Only</div>
+        </div>
+    </div>
+
+    <!-- Form wrapper -->
+    <div id="form-wrapper">
+
+        <!-- Form header -->
+        <div class="form-header">
+            <div class="form-id">FORM EI-7734</div>
+            <div class="form-title">EXIT INTERVIEW</div>
+            <div class="form-classification">CONFIDENTIAL — INTERNAL USE ONLY</div>
+            <div class="form-dept">Department of <span class="redacted-inline">████████████████</span> — Human Resources Division</div>
+            <div class="form-rule"></div>
+        </div>
+
+        <form id="exit-form" autocomplete="off" spellcheck="false">
+
+            <!-- Section 1: Personal Information -->
+            <fieldset class="form-section" data-section="1">
+                <legend>Section 1 — Personal Information</legend>
+                <div class="field-group">
+                    <label for="field-name">Full Legal Name <span class="required">*</span></label>
+                    <input type="text" id="field-name" name="name" required>
+                </div>
+                <div class="field-group">
+                    <label for="field-employee-id">Employee ID <span class="required">*</span></label>
+                    <input type="text" id="field-employee-id" name="employeeId" placeholder="Format: XX-XXXXXX">
+                </div>
+                <div class="field-group">
+                    <label for="field-department">Department <span class="required">*</span></label>
+                    <select id="field-department" name="department">
+                        <option value="">— Select —</option>
+                        <option value="review">Document Review</option>
+                        <option value="processing">Records Processing</option>
+                        <option value="compliance">Compliance &amp; Standards</option>
+                        <option value="oversight">Oversight Operations</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label for="field-start-date">Start Date <span class="required">*</span></label>
+                    <input type="date" id="field-start-date" name="startDate">
+                </div>
+            </fieldset>
+
+            <!-- Section 2: Reason for Departure -->
+            <fieldset class="form-section" data-section="2">
+                <legend>Section 2 — Reason for Departure</legend>
+                <div class="field-group">
+                    <label for="field-reason">Primary Reason <span class="required">*</span></label>
+                    <select id="field-reason" name="reason">
+                        <option value="">— Select —</option>
+                        <option value="voluntary">Voluntary Resignation</option>
+                        <option value="retirement">Retirement</option>
+                        <option value="transfer">Transfer to Another Division</option>
+                        <option value="personal">Personal Reasons</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label for="field-last-day">Last Day of Service</label>
+                    <input type="date" id="field-last-day" name="lastDay">
+                </div>
+            </fieldset>
+
+            <!-- Section 3: Exit Assessment -->
+            <fieldset class="form-section" data-section="3">
+                <legend>Section 3 — Exit Assessment</legend>
+                <div class="field-group rating-group">
+                    <label>Rate your overall experience (1–5) <span class="required">*</span></label>
+                    <div class="radio-row">
+                        <label class="radio-label"><input type="radio" name="experience" value="1"> 1</label>
+                        <label class="radio-label"><input type="radio" name="experience" value="2"> 2</label>
+                        <label class="radio-label"><input type="radio" name="experience" value="3"> 3</label>
+                        <label class="radio-label"><input type="radio" name="experience" value="4"> 4</label>
+                        <label class="radio-label"><input type="radio" name="experience" value="5"> 5</label>
+                    </div>
+                </div>
+                <div class="field-group rating-group">
+                    <label>Rate your direct supervisor (1–5)</label>
+                    <div class="radio-row">
+                        <label class="radio-label"><input type="radio" name="supervisor" value="1"> 1</label>
+                        <label class="radio-label"><input type="radio" name="supervisor" value="2"> 2</label>
+                        <label class="radio-label"><input type="radio" name="supervisor" value="3"> 3</label>
+                        <label class="radio-label"><input type="radio" name="supervisor" value="4"> 4</label>
+                        <label class="radio-label"><input type="radio" name="supervisor" value="5"> 5</label>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label for="field-comments">Additional Comments</label>
+                    <textarea id="field-comments" name="comments" rows="4" maxlength="500"></textarea>
+                    <span class="char-count" data-for="field-comments">0 / 500</span>
+                </div>
+            </fieldset>
+
+            <!-- Section 7 injected here by FormEngine.js -->
+
+            <!-- Section 4: Equipment Return -->
+            <fieldset class="form-section" data-section="4">
+                <legend>Section 4 — Equipment Return</legend>
+                <p class="section-note">Check all items that have been returned to your department.</p>
+                <div class="checkbox-list">
+                    <label class="checkbox-label"><input type="checkbox" name="equipment" value="laptop"> Laptop computer</label>
+                    <label class="checkbox-label"><input type="checkbox" name="equipment" value="badge"> Access badge &amp; credentials</label>
+                    <label class="checkbox-label"><input type="checkbox" name="equipment" value="keys"> Office / facility keys</label>
+                    <label class="checkbox-label"><input type="checkbox" name="equipment" value="phone"> Agency-issued phone</label>
+                    <label class="checkbox-label"><input type="checkbox" name="equipment" value="documents"> Classified documents (all copies)</label>
+                    <label class="checkbox-label"><input type="checkbox" name="equipment" value="apparatus"> Document review apparatus</label>
+                    <label class="checkbox-label"><input type="checkbox" name="equipment" value="calibration"> Calibration weights</label>
+                </div>
+            </fieldset>
+
+            <!-- Section 5: Non-Disclosure Agreement -->
+            <fieldset class="form-section" data-section="5">
+                <legend>Section 5 — Non-Disclosure Agreement</legend>
+                <div class="legal-text">
+                    <p>By signing below, I acknowledge that I have been informed of and agree to the
+                    following conditions governing the termination of my service with
+                    <span class="redacted-inline">████████████████</span>:</p>
+                    <p>I shall not disclose, reproduce, transmit, or otherwise make available
+                    to any unauthorized person or entity any document, file, record,
+                    annotation, memorandum, or other material classified as
+                    <span class="redacted-inline">████████</span> or above, including
+                    but not limited to the contents of any document currently designated
+                    for review under reference code <span class="redacted-inline">████-████</span>.</p>
+                    <p>I understand that violation of these conditions may result in
+                    <span class="redacted-inline">████████████████████████████████████████████████</span>.</p>
+                    <p>This agreement supersedes all prior communications, whether written
+                    or verbal, regarding the scope of my obligations. Retention of this
+                    form is the responsibility of the signatory.</p>
+                </div>
+                <div class="field-group">
+                    <label for="field-signature">Signature (type full legal name) <span class="required">*</span></label>
+                    <input type="text" id="field-signature" name="signature" class="signature-field">
+                </div>
+                <div class="field-group">
+                    <label for="field-sign-date">Date</label>
+                    <input type="date" id="field-sign-date" name="signDate">
+                </div>
+            </fieldset>
+
+            <!-- Section 6: Final Remarks -->
+            <fieldset class="form-section" data-section="6">
+                <legend>Section 6 — Final Remarks</legend>
+                <div class="field-group">
+                    <label for="field-remarks">Is there anything else you wish to report?</label>
+                    <textarea id="field-remarks" name="remarks" rows="6" maxlength="1000"></textarea>
+                    <span class="char-count" data-for="field-remarks">0 / 1000</span>
+                </div>
+            </fieldset>
+
+            <!-- Submit -->
+            <div class="form-actions">
+                <button type="submit" id="submit-btn">Submit Exit Interview</button>
+                <div class="page-count">Page 1 of <span id="page-total">1</span></div>
+            </div>
+        </form>
+
+        <!-- Dossier (hidden, replaces form on submit) -->
+        <div id="dossier" style="display: none;"></div>
+
+    </div>
+
+    <!-- Debug overlay -->
+    <div id="debug-overlay" class="debug-overlay hidden">
+        <div class="debug-title">exit interview — debug</div>
+        <div id="debug-content"></div>
+        <button id="debug-reset">reset state</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="src/core/ExitState.js"></script>
+    <script src="src/systems/FormEngine.js"></script>
+    <script src="src/systems/DossierSystem.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>

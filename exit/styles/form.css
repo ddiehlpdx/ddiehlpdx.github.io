@@ -1,0 +1,503 @@
+/* ============================================
+   FORM.CSS — Government exit interview aesthetic
+   Exit Interview — Form EI-7734
+   ============================================ */
+
+/* ---- Form header ---- */
+
+.form-header {
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+}
+
+.form-id {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #999;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.form-title {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+}
+
+.form-classification {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8b1a1a;
+    margin-bottom: 8px;
+}
+
+.form-dept {
+    font-size: 12px;
+    color: #555;
+    font-style: italic;
+}
+
+.form-rule {
+    margin-top: 16px;
+    border: none;
+    border-top: 2px solid #1a1a1a;
+}
+
+/* ---- Fieldsets / sections ---- */
+
+.form-section {
+    border: none;
+    margin-bottom: 28px;
+    padding: 0;
+}
+
+.form-section legend {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #666;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.section-note {
+    font-size: 11px;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 12px;
+}
+
+/* ---- Injected Section 7 ---- */
+
+.section-injected {
+    background-color: #f5f5e8;
+    padding: 16px !important;
+    border: 1px dashed #aaa !important;
+    margin-top: -4px;
+}
+
+.section-injected legend {
+    background-color: #f5f5e8;
+    padding: 0 8px 6px 0;
+}
+
+/* ---- Field groups ---- */
+
+.field-group {
+    margin-bottom: 14px;
+}
+
+.field-group label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #444;
+    margin-bottom: 4px;
+}
+
+.required {
+    color: #8b1a1a;
+    font-weight: bold;
+}
+
+/* ---- Inputs ---- */
+
+#exit-form input[type="text"],
+#exit-form input[type="date"],
+#exit-form select,
+#exit-form textarea {
+    display: block;
+    width: 100%;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    color: #1a1a1a;
+    background-color: #fff;
+    border: 1px solid #999;
+    border-radius: 0;
+    padding: 8px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+#exit-form input[type="text"]:focus,
+#exit-form input[type="date"]:focus,
+#exit-form select:focus,
+#exit-form textarea:focus {
+    outline: 1px solid #666;
+    border-color: #666;
+}
+
+textarea {
+    resize: vertical;
+    line-height: 1.5;
+}
+
+select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+}
+
+/* ---- Signature field ---- */
+
+.signature-field {
+    font-family: 'Brush Script MT', 'Segoe Script', cursive;
+    font-size: 18px;
+    font-style: italic;
+    border-bottom: 2px solid #1a1a1a;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background: transparent;
+    padding: 4px 0;
+}
+
+.signature-field:focus {
+    outline: none;
+    border-bottom-color: #444;
+}
+
+/* ---- Radio buttons ---- */
+
+.rating-group label:first-child {
+    margin-bottom: 6px;
+}
+
+.radio-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 4px;
+}
+
+.radio-label {
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    color: #1a1a1a !important;
+    cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* ---- Checkboxes ---- */
+
+.checkbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.checkbox-label {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    color: #1a1a1a !important;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* ---- Character count ---- */
+
+.char-count {
+    display: block;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 10px;
+    color: #999;
+    text-align: right;
+    margin-top: 2px;
+}
+
+/* ---- Legal text ---- */
+
+.legal-text {
+    font-size: 11px;
+    color: #333;
+    line-height: 1.6;
+    text-align: justify;
+    margin-bottom: 16px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+}
+
+.legal-text p {
+    margin-bottom: 8px;
+}
+
+.legal-text p:last-child {
+    margin-bottom: 0;
+}
+
+/* ---- Redacted inline ---- */
+
+.redacted-inline {
+    background-color: #0a0a0a;
+    color: transparent;
+    padding: 1px 2px;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.redacted-inline::selection {
+    background-color: #0a0a0a;
+    color: transparent;
+}
+
+/* ---- Form actions ---- */
+
+.form-actions {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid #999;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#submit-btn {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #fff;
+    background-color: #555;
+    border: 1px solid #333;
+    border-radius: 0;
+    padding: 10px 24px;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+#submit-btn:hover {
+    background-color: #444;
+}
+
+#submit-btn:active {
+    background-color: #333;
+}
+
+#submit-btn:disabled {
+    background-color: #999;
+    cursor: default;
+}
+
+.page-count {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 10px;
+    color: #999;
+    letter-spacing: 1px;
+}
+
+/* ---- Dossier ---- */
+
+#dossier {
+    padding-top: 20px;
+}
+
+.dossier-header {
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #1a1a1a;
+}
+
+.dossier-classification {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8b1a1a;
+    margin-bottom: 8px;
+}
+
+.dossier-title {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.dossier-id {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px;
+    color: #666;
+    letter-spacing: 1px;
+}
+
+.dossier-intro {
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.dossier-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+}
+
+.dossier-table td {
+    font-size: 12px;
+    padding: 6px 8px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.dossier-table td:first-child {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #666;
+    width: 40%;
+    white-space: nowrap;
+}
+
+.dossier-table td:last-child {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    color: #1a1a1a;
+}
+
+.dossier-cross-ref {
+    margin-top: 20px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+}
+
+.dossier-cross-ref h3 {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8b1a1a;
+    margin-bottom: 8px;
+}
+
+.dossier-cross-ref p {
+    font-size: 12px;
+    color: #333;
+    line-height: 1.5;
+}
+
+.dossier-footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid #999;
+    text-align: center;
+}
+
+.dossier-footer p {
+    font-size: 14px;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+}
+
+.confirm-btn {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #fff;
+    background-color: #555;
+    border: 1px solid #333;
+    border-radius: 0;
+    padding: 10px 40px;
+    cursor: pointer;
+}
+
+.confirm-btn:hover {
+    background-color: #444;
+}
+
+.confirm-btn:disabled {
+    background-color: #999;
+    cursor: default;
+}
+
+.dossier-filed {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #999;
+    margin-top: 16px;
+}
+
+.dossier-filed a {
+    color: #999;
+    text-decoration: none;
+}
+
+/* ---- Debug ---- */
+
+.debug-overlay button {
+    display: block;
+    margin-top: 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 10px;
+    color: #00ff00;
+    background: transparent;
+    border: 1px solid #00ff00;
+    padding: 4px 8px;
+    cursor: pointer;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+    #form-wrapper {
+        padding: 20px 24px 60px;
+    }
+
+    .form-title {
+        font-size: 18px;
+    }
+
+    .radio-row {
+        gap: 12px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .dossier-table td:first-child {
+        white-space: normal;
+    }
+}
