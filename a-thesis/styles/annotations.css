@@ -1,0 +1,24 @@
+/* ============================================
+   ANNOTATIONS.CSS — Inline censor annotations
+   "A Thesis" — Editorial insertions between paragraphs
+   ============================================ */
+
+.annotation {
+    display: block;
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: #1a3060;
+    line-height: 1.4;
+    margin: 16px 0 16px 24px;
+    padding-left: 12px;
+    border-left: 2px solid rgba(26, 48, 96, 0.3);
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.annotation.visible {
+    opacity: 1;
+}

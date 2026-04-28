@@ -1,0 +1,276 @@
+/* ============================================
+   TYPOGRAPHY.CSS — Serif fonts, institutional type hierarchy
+   "A Thesis" — Formal document typography
+   ============================================ */
+
+/* ---- Body text ---- */
+
+.body-text {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 16px;
+    line-height: 1.85;
+    color: #1a1a1a;
+    text-align: justify;
+    margin-bottom: 20px;
+    text-indent: 0;
+}
+
+.body-text:last-child {
+    margin-bottom: 0;
+}
+
+/* ---- Thesis body (writer's voice) ---- */
+
+.thesis-body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 16px;
+    line-height: 1.85;
+    color: #1a1a1a;
+    text-align: justify;
+    margin-bottom: 20px;
+    text-indent: 0;
+}
+
+.thesis-body:last-child {
+    margin-bottom: 0;
+}
+
+.thesis-body em {
+    font-style: italic;
+    letter-spacing: 0.02em;
+}
+
+/* ---- Section headings ---- */
+
+.section-heading {
+    font-family: 'Georgia', serif;
+    font-size: 14px;
+    font-weight: normal;
+    letter-spacing: 3px;
+    text-transform: lowercase;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.15);
+}
+
+/* ---- Section title (track name, below heading) ---- */
+
+.section-title {
+    font-family: 'Georgia', serif;
+    font-size: 13px;
+    font-weight: normal;
+    font-style: italic;
+    letter-spacing: 1px;
+    text-transform: lowercase;
+    color: #4a4a4a;
+    margin-bottom: 28px;
+}
+
+/* ---- Document header ---- */
+
+#document-header {
+    margin-bottom: 60px;
+}
+
+.header-line {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #4a4a4a;
+    line-height: 2.2;
+    height: 1lh;
+    overflow: hidden;
+}
+
+.header-line .typewriter-cursor {
+    display: inline-block;
+    width: 6px;
+    height: 12px;
+    background-color: #4a4a4a;
+    margin-left: 1px;
+    animation: cursorBlink 0.6s step-end infinite;
+    vertical-align: text-bottom;
+}
+
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.header-date {
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* ---- Track table ---- */
+
+.track-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: lowercase;
+}
+
+.track-table thead th {
+    text-align: left;
+    font-weight: normal;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #4a4a4a;
+    padding: 0 12px 12px 0;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.2);
+}
+
+.track-table tbody tr {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.track-table tbody tr.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.track-table td {
+    padding: 14px 12px 14px 0;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.06);
+    vertical-align: top;
+    color: #1a1a1a;
+}
+
+.track-number {
+    width: 60px;
+    color: #4a4a4a;
+}
+
+.track-title {
+    font-family: 'Georgia', serif;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+.track-status,
+.track-duration {
+    width: 80px;
+    text-align: right;
+    font-size: 11px;
+}
+
+/* ---- Exhibit log ---- */
+
+.exhibit-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.exhibit-entry {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: lowercase;
+    color: #4a4a4a;
+    line-height: 1.8;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(26, 26, 26, 0.05);
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.exhibit-entry.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.exhibit-id {
+    font-weight: bold;
+    margin-right: 16px;
+    color: #1a1a1a;
+}
+
+.exhibit-date {
+    margin-right: 16px;
+    color: #4a4a4a;
+}
+
+.exhibit-desc {
+    color: #4a4a4a;
+}
+
+/* ---- Footer ---- */
+
+#document-footer {
+    margin-top: 80px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+#document-footer.revealed {
+    opacity: 1;
+}
+
+.footer-line {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: lowercase;
+    color: #4a4a4a;
+    line-height: 2;
+}
+
+/* ---- Hidden words (clickable triggers) ---- */
+
+.hidden-word {
+    cursor: default;
+    -webkit-user-select: none;
+    user-select: none;
+    position: relative;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+    .body-text {
+        font-size: 15px;
+        line-height: 1.75;
+        text-align: left;
+    }
+
+    .track-table {
+        font-size: 11px;
+    }
+
+    .track-table thead th {
+        font-size: 9px;
+    }
+
+    .track-title {
+        font-size: 13px;
+    }
+
+    .track-status,
+    .track-duration {
+        width: 60px;
+    }
+
+    .exhibit-entry {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .track-table thead th:nth-child(3),
+    .track-table thead th:nth-child(4),
+    .track-table td:nth-child(3),
+    .track-table td:nth-child(4) {
+        display: none;
+    }
+}

@@ -1,0 +1,130 @@
+/* ============================================
+   REDACTION.CSS — Black bars, flicker, crack reveals
+   "A Thesis" — Redacted document system
+   ============================================ */
+
+/* ---- Base redaction bar ---- */
+
+.redacted {
+    position: relative;
+    display: inline;
+    background-color: #0a0a0a;
+    color: transparent;
+    padding: 1px 2px;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+    transition: background-color 0.05s;
+}
+
+/* Screen readers see the text; visual users see the bar */
+.redacted::selection {
+    background-color: #0a0a0a;
+    color: transparent;
+}
+
+/* ---- Redacted link (for the "see also" hidden link) ---- */
+
+.redacted-link {
+    position: relative;
+    display: inline;
+    background-color: #0a0a0a;
+    color: transparent;
+    padding: 1px 2px;
+    text-decoration: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default; /* deliberately no pointer cursor */
+}
+
+.redacted-link:hover {
+    background-color: #0a0a0a;
+    color: transparent;
+}
+
+.redacted-link:visited {
+    color: transparent;
+}
+
+/* ---- Flicker redaction (hover/tap reveals glimpses) ---- */
+
+.redacted[data-type="flicker"] {
+    cursor: default;
+}
+
+.redacted[data-type="flicker"].flickering {
+    animation: redactionFlicker 0.6s step-end infinite;
+}
+
+@keyframes redactionFlicker {
+    0%  { background-color: #0a0a0a; color: transparent; }
+    15% { background-color: transparent; color: #1a1a1a; }
+    20% { background-color: #0a0a0a; color: transparent; }
+    55% { background-color: #0a0a0a; color: transparent; }
+    60% { background-color: transparent; color: #1a1a1a; }
+    66% { background-color: #0a0a0a; color: transparent; }
+    100% { background-color: #0a0a0a; color: transparent; }
+}
+
+/* ---- Timed redaction (cracks open after threshold) ---- */
+
+.redacted[data-type="timed"] {
+    overflow: hidden;
+}
+
+.redacted[data-type="timed"].cracking {
+    background-color: transparent;
+    color: transparent;
+}
+
+.redacted[data-type="timed"].cracking::before,
+.redacted[data-type="timed"].cracking::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background-color: #0a0a0a;
+    transition: transform 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.redacted[data-type="timed"].cracking::before {
+    left: 0;
+    width: 50%;
+    transform: translateX(0);
+    transform-origin: left center;
+}
+
+.redacted[data-type="timed"].cracking::after {
+    right: 0;
+    width: 50%;
+    transform: translateX(0);
+    transform-origin: right center;
+}
+
+.redacted[data-type="timed"].cracked {
+    background-color: transparent;
+    color: #1a1a1a;
+}
+
+.redacted[data-type="timed"].cracked::before {
+    transform: translateX(-110%);
+}
+
+.redacted[data-type="timed"].cracked::after {
+    transform: translateX(110%);
+}
+
+/* ---- Permanent redaction ---- */
+
+.redacted[data-type="permanent"] {
+    pointer-events: none;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+    /* Slightly larger tap targets for flicker redactions on mobile */
+    .redacted[data-type="flicker"] {
+        padding: 3px 4px;
+    }
+}

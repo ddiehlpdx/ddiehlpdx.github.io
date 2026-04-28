@@ -1,0 +1,280 @@
+/* ============================================
+   DOCUMENT.CSS — Page layout, paper texture, vignette
+   "A Thesis" — Institutional document aesthetic
+   ============================================ */
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    min-height: 100%;
+    background-color: #f4f0e8;
+    color: #1a1a1a;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---- Paper grain canvas (used for generation only, hidden after init) ---- */
+
+#paper-grain {
+    display: none;
+}
+
+/* ---- Paper texture overlays ---- */
+
+.paper-stain {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.stain-coffee {
+    width: 180px;
+    height: 180px;
+    top: 22%;
+    right: 12%;
+    border-radius: 50%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(139, 109, 60, 0.04) 0%,
+        rgba(139, 109, 60, 0.02) 40%,
+        rgba(139, 109, 60, 0.01) 60%,
+        transparent 70%
+    );
+}
+
+.fold-line {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.fold-horizontal {
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.03) 20%,
+        rgba(0, 0, 0, 0.05) 50%,
+        rgba(0, 0, 0, 0.03) 80%,
+        transparent 100%
+    );
+}
+
+.fold-vertical {
+    top: 0;
+    left: 38%;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.02) 20%,
+        rgba(0, 0, 0, 0.04) 50%,
+        rgba(0, 0, 0, 0.02) 80%,
+        transparent 100%
+    );
+}
+
+/* ---- Edge vignette ---- */
+
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    box-shadow:
+        inset 0 0 120px rgba(0, 0, 0, 0.08),
+        inset 0 0 300px rgba(0, 0, 0, 0.03);
+}
+
+/* ---- Document wrapper ---- */
+
+#document-wrapper {
+    position: relative;
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 80px 60px 120px;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+#document-wrapper.visible {
+    opacity: 1;
+}
+
+/* ---- Init overlay ---- */
+
+#init-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #f4f0e8;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: opacity 0.8s ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+#init-overlay.dismissed {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.init-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #4a4a4a;
+    opacity: 0.6;
+    animation: initPulse 3s ease-in-out infinite;
+}
+
+@keyframes initPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.7; }
+}
+
+/* ---- Document sections ---- */
+
+.document-section {
+    margin-bottom: 60px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.document-section.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ---- Header and footer rules ---- */
+
+.header-rule,
+.footer-rule {
+    height: 1px;
+    background-color: #1a1a1a;
+    margin: 20px 0;
+    opacity: 0.3;
+}
+
+/* ---- Stamp overlay ---- */
+
+.stamp-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 500;
+}
+
+.stamp-overlay.hidden {
+    display: none;
+}
+
+.stamp-text {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 48px;
+    font-weight: bold;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #a01a1a;
+    border: 4px solid #a01a1a;
+    text-shadow: 0 0 2px rgba(160, 26, 26, 0.4);
+    padding: 12px 24px;
+    transform: rotate(-12deg);
+    opacity: 0;
+}
+
+/* ---- Debug overlay ---- */
+
+.debug-overlay {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.85);
+    color: #00ff00;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px;
+    padding: 12px;
+    z-index: 9999;
+    max-width: 300px;
+    line-height: 1.5;
+    border: 1px solid #00ff00;
+}
+
+.debug-overlay.hidden {
+    display: none;
+}
+
+.debug-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+#debug-reset {
+    margin-top: 8px;
+    background: none;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 10px;
+    padding: 4px 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+#debug-reset:hover {
+    background: #00ff00;
+    color: #000;
+}
+
+/* ---- Utility ---- */
+
+.hidden {
+    display: none !important;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+    #document-wrapper {
+        padding: 40px 24px 80px;
+    }
+
+    .stamp-text {
+        font-size: 32px;
+    }
+}

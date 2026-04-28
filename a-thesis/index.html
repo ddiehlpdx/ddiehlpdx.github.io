@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOCUMENT REF: A THESIS</title>
+
+    <!-- Ensure trailing slash so relative paths resolve correctly -->
+    <script>
+        if (!window.location.pathname.endsWith('/') && !window.location.pathname.includes('.')) {
+            window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+        }
+    </script>
+
+    <!--
+        Critical inline styles ensure the init state works regardless of
+        external CSS load status. The external stylesheets provide the
+        full design; these are the safety net.
+    -->
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { height: 100%; overflow-x: hidden; }
+        body {
+            min-height: 100%;
+            background-color: #f4f0e8;
+            color: #1a1a1a;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Init overlay — MUST block page on load */
+        #init-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: #f4f0e8;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        #init-overlay.dismissed {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+        .init-text {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #4a4a4a;
+            opacity: 0.6;
+            animation: initPulse 3s ease-in-out infinite;
+        }
+        @keyframes initPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Document wrapper — hidden until init */
+        #document-wrapper {
+            position: relative;
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 80px 60px 120px;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        #document-wrapper.visible { opacity: 1; }
+
+        /* Paper grain canvas (used for generation only, hidden after init) */
+        #paper-grain {
+            display: none;
+        }
+
+        /* Edge vignette */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            box-shadow: inset 0 0 120px rgba(0,0,0,0.08), inset 0 0 300px rgba(0,0,0,0.03);
+        }
+
+        /* Paper overlays */
+        .paper-stain, .fold-line { position: fixed; pointer-events: none; z-index: 1; }
+        .stain-coffee {
+            width: 180px; height: 180px;
+            top: 22%; right: 12%;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at center, rgba(139,109,60,0.04) 0%, rgba(139,109,60,0.02) 40%, rgba(139,109,60,0.01) 60%, transparent 70%);
+        }
+        .fold-horizontal {
+            top: 50%; left: 0; width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.03) 20%, rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.03) 80%, transparent 100%);
+        }
+        .fold-vertical {
+            top: 0; left: 38%; width: 1px; height: 100%;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.02) 20%, rgba(0,0,0,0.04) 50%, rgba(0,0,0,0.02) 80%, transparent 100%);
+        }
+
+        /* Blood drop / stain effect */
+        .blood-drop {
+            position: fixed;
+            width: 6px; height: 8px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            background: rgba(160, 20, 20, 0.8);
+            pointer-events: none;
+            z-index: 3;
+        }
+        .blood-stain {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+            mix-blend-mode: multiply;
+            background: radial-gradient(ellipse at center,
+                rgba(155, 20, 20, 0.45) 0%,
+                rgba(140, 18, 18, 0.25) 30%,
+                rgba(130, 15, 15, 0.12) 55%,
+                rgba(120, 12, 12, 0.04) 75%,
+                transparent 90%);
+        }
+        .blood-splatter {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+            mix-blend-mode: multiply;
+            border-radius: 50%;
+            background: rgba(150, 20, 20, 0.35);
+        }
+        .blood-pool {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: multiply;
+            background: radial-gradient(ellipse at center,
+                rgba(140, 15, 15, 0.35) 0%,
+                rgba(130, 12, 12, 0.18) 30%,
+                rgba(120, 10, 10, 0.08) 55%,
+                rgba(110, 8, 8, 0.02) 80%,
+                transparent 100%);
+        }
+
+        /* Redaction bars — must work inline */
+        .redacted {
+            position: relative;
+            display: inline;
+            background-color: #0a0a0a;
+            color: transparent;
+            padding: 1px 2px;
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: default;
+        }
+        .redacted::selection { background-color: #0a0a0a; color: transparent; }
+
+        .redacted-link {
+            display: inline;
+            background-color: #0a0a0a;
+            color: transparent;
+            padding: 1px 2px;
+            text-decoration: none;
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: default;
+        }
+        .redacted-link:hover, .redacted-link:visited, .redacted-link:active {
+            background-color: #0a0a0a;
+            color: transparent;
+        }
+
+        /* Sections hidden until scroll-revealed */
+        .document-section {
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .document-section.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Track rows hidden until revealed */
+        .track-row {
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .track-row.revealed { opacity: 1; transform: translateY(0); }
+
+        /* Exhibit entries hidden until revealed */
+        .exhibit-entry {
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .exhibit-entry.revealed { opacity: 1; transform: translateY(0); }
+
+        /* Footer hidden until revealed */
+        #document-footer {
+            margin-top: 80px;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        #document-footer.revealed { opacity: 1; }
+
+        /* Debug & stamp overlays */
+        .debug-overlay {
+            position: fixed;
+            top: 10px; left: 10px;
+            background: rgba(0,0,0,0.85);
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            padding: 12px;
+            z-index: 9999;
+            max-width: 300px;
+            line-height: 1.5;
+            border: 1px solid #00ff00;
+        }
+        .stamp-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 500;
+        }
+        .hidden { display: none !important; }
+    </style>
+
+    <!-- External stylesheets for full design -->
+    <link rel="stylesheet" href="styles/document.css">
+    <link rel="stylesheet" href="styles/typography.css">
+    <link rel="stylesheet" href="styles/redaction.css">
+    <link rel="stylesheet" href="styles/annotations.css">
+</head>
+<body>
+    <!-- Init overlay — required for future audio context -->
+    <div id="init-overlay">
+        <span class="init-text">open file</span>
+    </div>
+
+    <!-- Paper grain texture (canvas-generated) -->
+    <canvas id="paper-grain"></canvas>
+
+    <!-- Paper texture overlays -->
+    <div class="paper-stain stain-coffee"></div>
+    <div class="fold-line fold-horizontal"></div>
+    <div class="fold-line fold-vertical"></div>
+
+    <!-- Document wrapper — scrollable -->
+    <div id="document-wrapper">
+
+        <!-- Document header -->
+        <header id="document-header">
+            <div class="header-line" data-typewriter>document ref: [unnamed] / cycle 01 / a thesis</div>
+            <div class="header-line" data-typewriter data-delay="800">status: filed</div>
+            <div class="header-line" data-typewriter data-delay="1600">date: <span class="header-date" id="date-field">████████</span></div>
+            <div class="header-line" data-typewriter data-delay="2400">classification: <span class="redacted" data-type="permanent">████████████</span></div>
+            <div class="header-rule"></div>
+        </header>
+
+        <!-- Section I: On Using Politics as a Ternary Operator -->
+        <section id="section-1" class="document-section" data-section="section-1">
+            <h2 class="section-heading">i.</h2>
+            <h3 class="section-title">on using politics as a ternary operator</h3>
+
+            <p class="thesis-body">
+                the proposition is simple and it should not need to be stated but it does because
+                <span class="redacted" data-type="flicker">you have forgotten how to hold two things at once</span>.
+                every position arrives pre-sorted. every claim pre-evaluated — not on the basis of
+                its <span class="hidden-word" data-stamp="NOTED">evidence</span> but on the basis
+                of who is making it. the mouth determines the truth value.
+                <span class="redacted" data-type="permanent">████████████████████</span>
+                there is no third branch. there was never meant to be.
+            </p>
+
+            <div class="annotation">this section flagged for review</div>
+
+            <p class="thesis-body">
+                consider the function as written. it does not ask what you believe. it asks
+                <span class="redacted" data-type="flicker">where you stand</span> and from that
+                single input derives everything — your morality, your worth, your right to
+                speak on the matter at all. this is not a political document. this is a document
+                about the <span class="hidden-word" data-stamp="SEE APPENDIX ██">machinery</span>
+                that makes political documents
+                <span class="redacted" data-type="permanent">impossible to read without choosing a side</span>.
+            </p>
+
+            <div class="annotation">the author's framing is itself a binary — see irony</div>
+
+            <p class="thesis-body">
+                the ternary operator does not evaluate — it <em>sorts</em>. it takes your grief
+                and returns a party. it takes your hunger and returns a platform. it takes your
+                <span class="redacted" data-type="flicker">dead</span> and tells you who to blame.
+                and you accept this. you accept this because the alternative is
+                <span class="redacted" data-type="permanent">████████████</span> and the alternative
+                requires you to hold the contradiction in your hands without dropping it and
+                <em>who has the strength for that anymore</em> — who has the bandwidth — who
+                has the <span class="redacted" data-type="flicker">stomach</span> —
+            </p>
+
+            <div class="annotation">stop. this is not what was approved.</div>
+
+            <p class="thesis-body">
+                — the author wishes to note for the record that this is not a position. this is a
+                <span class="redacted" data-type="permanent">████████</span>. the difference matters.
+                the difference is the entire point. but you will sort this too. you are
+                <span class="redacted" data-type="timed" data-threshold="180">already sorting it. you sorted it the moment you saw the title. the operator was never the problem. you are the input.</span>
+            </p>
+        </section>
+
+        <!-- Section II: On the Systematic Elimination of Checks and Balances -->
+        <section id="section-2" class="document-section" data-section="section-2">
+            <h2 class="section-heading">ii.</h2>
+            <h3 class="section-title">on the systematic elimination of checks and balances</h3>
+
+            <p class="thesis-body">
+                this section constitutes the statement of crisis as required by the committee.
+                the author does not use this term lightly. the crisis is structural and it is
+                not theoretical — the independent review apparatus has been
+                <span class="redacted" data-type="flicker">hollowed from the inside</span>.
+                the inspectors general — all of them — removed not in secrecy but in
+                plain sight. the judicial review body restructured to
+                <span class="redacted" data-type="permanent">████████████████████████████████</span>
+                and the legislative body sat and watched and did nothing because doing nothing
+                was the position they had
+                <span class="redacted" data-type="flicker">chosen</span>.
+            </p>
+
+            <div class="annotation">this characterization is disputed — see official statement</div>
+
+            <p class="thesis-body">
+                the mechanism was elegant in its simplicity. you do not need to abolish
+                the check — you replace the person holding it. you do not eliminate
+                the balance — you
+                <span class="redacted" data-type="flicker">load one side until the scale breaks</span>
+                and then point to the broken scale and say it was never working anyway.
+                the independent counsel dissolved. the oversight committees
+                <span class="redacted" data-type="permanent">████████████████████</span>.
+                the career officials — the ones who understood the machinery from the inside —
+                systematically replaced with
+                <span class="redacted" data-type="permanent">████████████████████████</span>
+                and nobody stopped it. the legislative body had the authority. they had the
+                mechanism. they had the
+                <span class="hidden-word" data-stamp="NOTED">constitutional</span>
+                obligation and they looked at it and they set it down.
+            </p>
+
+            <div class="annotation">the author does not have clearance to assess structural integrity</div>
+
+            <p class="thesis-body">
+                what do you call a body that has the power to act and does not act?
+                cowardice is too generous. cowardice implies fear. this was
+                <span class="redacted" data-type="flicker">permission</span>.
+                this was a calculation — the cost of opposition weighed against the cost
+                of silence and the silence was cheaper. the silence was always cheaper.
+                and now the checking function does not exist. it is not weakened. it is
+                not under threat. it does not
+                <span class="redacted" data-type="timed" data-threshold="240">exist. you are living in the aftermath and you have not noticed because the structure is still standing. only the structure. the rooms are empty. the chairs are empty. the mechanism turns and catches nothing.</span>
+            </p>
+
+            <div class="annotation">this is dangerous. file under review. do not circulate.</div>
+
+            <p class="thesis-body">
+                the author submits that this is not a partisan observation. every administration
+                <span class="redacted" data-type="flicker">erodes</span>. but there is a
+                difference between erosion and
+                <span class="redacted" data-type="permanent">████████████</span>. one is weather.
+                the other is <span class="hidden-word" data-stamp="SEE APPENDIX ██">demolition</span>.
+                the record will show which this was. if the record survives.
+            </p>
+        </section>
+
+        <!-- SECTION III -->
+        <section id="section-3" class="document-section" data-section="section-3">
+            <h2 class="section-heading">iii.</h2>
+            <h3 class="section-title">on the adoption of revisionist history</h3>
+
+            <p class="thesis-body">
+                the evidence is as follows. on <span class="redacted" data-type="permanent">████████</span>
+                the <span class="redacted" data-type="permanent">████████</span> was breached. this
+                is not in dispute. the footage exists. the arrests were made. the convictions were
+                entered into the record. and then —
+                <span class="redacted" data-type="flicker">the record was rewritten</span>.
+                the convicted were pardoned. the pardoned were called patriots. the
+                <span class="hidden-word" data-stamp="NOTED">footage</span> was reinterpreted.
+                the official account — published on the very walls of the institution that was
+                breached — now states that the breach was
+                <span class="redacted" data-type="permanent">████████████████████████</span>.
+                the author would like to note that this is not interpretation. this is
+                <span class="redacted" data-type="flicker">replacement</span>.
+            </p>
+
+            <div class="annotation">this account is disputed — see official record</div>
+
+            <p class="thesis-body">
+                the mechanism requires two conditions. first — a record must exist. second —
+                the authority to declare what the record says must belong to someone other
+                than the record itself. once these conditions are met the process is
+                straightforward. you do not destroy the evidence. you do not need to.
+                you simply <span class="redacted" data-type="flicker">tell them what it shows</span>
+                and they believe you because you are the authority and the evidence is just
+                evidence — it does not speak — it does not
+                <span class="redacted" data-type="permanent">████████████████</span>.
+                and now there is a new tool that completes the loop. you can fabricate
+                what was never said. you can deny what was. the same instrument does both. the
+                concept of <span class="hidden-word" data-stamp="SEE APPENDIX ██">proof</span>
+                <span class="redacted" data-type="flicker">ceases to function</span>
+                and the only thing left is who has the power to assert.
+            </p>
+
+            <div class="annotation">correction: the gathering was a demonstration of civic engagement</div>
+
+            <p class="thesis-body">
+                but this is not new. the author must be honest about this. the teaching
+                materials were rewritten long before the current crisis. the chapter on the
+                conquered was revised to say they
+                <span class="redacted" data-type="flicker">benefited from their conquest</span>.
+                the word <em>benefit</em> — used in proximity to the word
+                <span class="redacted" data-type="permanent">████████████</span> — and this
+                was approved. this was curriculum. children read this and the old books were
+                removed from the shelves and the librarians were told the books had never
+                been there and the teachers who objected were replaced with teachers who
+                did not. this is the longer pattern. the current crisis is not an
+                aberration — it is an
+                <span class="redacted" data-type="permanent">████████████████</span>.
+                it is the pattern arriving at its logical conclusion.
+            </p>
+
+            <div class="annotation">this section has been reviewed and corrected. disregard the original.</div>
+
+            <p class="thesis-body">
+                the author apologizes. the catalogue was supposed to be orderly. entry by
+                entry. date and claim and correction. but there are too many. there are
+                too many to hold. the plague came and the healers fought it and now the
+                record says the healers were the
+                <span class="redacted" data-type="flicker">disease</span>. the guards
+                defended the building and now the record says the guards were the aggressors.
+                the author watched — <em>you</em> watched — we all watched the same
+                thing happen and then we watched them tell us it did not happen and
+                <span class="redacted" data-type="timed" data-threshold="300">half of us believed them. not because the lie was convincing. because believing was easier than remembering. because the truth required you to do something and you did not want to do anything. the revisionism is not the crime. the adoption is the crime. you adopted it. you are adopting it right now.</span>
+            </p>
+        </section>
+
+        <!-- SECTION IV -->
+        <section id="section-4" class="document-section" data-section="section-4">
+            <h2 class="section-heading">iv.</h2>
+            <h3 class="section-title">on the price of sycophancy and cowardice</h3>
+
+            <p class="thesis-body">
+                the author will now speak plainly. the positions have been filled.
+                the watchdogs — all of them — removed in a single evening. the career
+                officials who understood the machinery from the inside — the ones who
+                had spent decades learning which valves to close and which to leave open —
+                <span class="redacted" data-type="flicker">systematically replaced</span>
+                with individuals selected on a single criterion. not
+                <span class="hidden-word" data-stamp="NOTED">expertise</span>. not
+                competence. not even ideology. <span class="redacted" data-type="flicker">obedience</span>.
+                the author does not use this word loosely. the selection function is documented.
+                the pattern is not ambiguous.
+                <span class="redacted" data-type="permanent">████████████████████████████████</span>
+            </p>
+
+            <div class="annotation">these appointments were confirmed through proper legislative process</div>
+
+            <p class="thesis-body">
+                and then the children were sent in. the author uses this word deliberately —
+                not to diminish but to measure. they were given access to systems built
+                before they were born. payment infrastructure handling
+                <span class="redacted" data-type="permanent">████████████████</span> in
+                disbursements. personnel records for
+                <span class="redacted" data-type="permanent">████████████</span> employees.
+                systems written in languages older than their parents, running on logic they
+                could not read. they were told to
+                <span class="redacted" data-type="flicker">move fast</span>. they moved fast.
+                they made changes to live systems without review, without testing, without
+                understanding what the systems were for. the
+                <span class="redacted" data-type="permanent">████████████████████████</span>
+                was not a bug. it was the method.
+            </p>
+
+            <div class="annotation">the author confuses efficiency with recklessness</div>
+
+            <p class="thesis-body">
+                the author will now present the cost. not in rhetoric. in years.
+                the senior career workforce — the institutional memory of the state —
+                reduced by thirty percent in twelve months. this is not a statistic. this
+                is <span class="redacted" data-type="flicker">decades of accumulated knowledge</span>
+                that cannot be rebuilt because the people who held it are gone and the
+                conditions under which they learned no longer exist. the diplomatic corps
+                hollowed — a quarter departed, the rest demoralized into silence. the
+                public health apparatus
+                <span class="redacted" data-type="permanent">████████████████████████</span>.
+                the scientific advisory process corrupted and then judicially invalidated.
+                the military leadership purged — not for failure but for
+                <span class="redacted" data-type="flicker">independence</span>.
+                the author estimates the rebuilding time at
+                <span class="hidden-word" data-stamp="SEE APPENDIX ██">twenty years</span>.
+                this is optimistic. it assumes someone begins.
+            </p>
+
+            <div class="annotation">i was qualified. i was.</div>
+
+            <p class="thesis-body">
+                but the price is not what was destroyed. the price is what was created.
+                everyone who remains has learned the lesson. the lesson is simple —
+                <span class="redacted" data-type="flicker">independence is punished</span>.
+                the officials who contradicted their own assessments to remain in their
+                positions. the scientists who watched their recommendations reversed and
+                said nothing. the officers who saw their colleagues removed for
+                <span class="redacted" data-type="permanent">████████████</span> and understood.
+                the institution still stands. the chairs are filled. but every person
+                sitting in them has been taught that the correct answer is the one they
+                are told to give.
+                <span class="redacted" data-type="timed" data-threshold="360">this is the sycophancy. not the appointment of fools — that is merely the mechanism. the sycophancy is the silence of everyone who knows better. the cowardice is not theirs alone. it is yours. you watched the expertise of the state dismantled and replaced with loyalty and you did not find this unacceptable. the price will be paid in decades you will not connect to this moment. but the author will connect them. the author will not stop connecting them.</span>
+            </p>
+        </section>
+
+        <!-- SECTION V -->
+        <section id="section-5" class="document-section" data-section="section-5">
+            <h2 class="section-heading">v.</h2>
+            <h3 class="section-title">on the inevitability of consequences</h3>
+
+            <p class="thesis-body">
+                the author returns to the operator. the ternary operator from the first section —
+                the sorting function — the one that takes your grief and returns a party. the
+                author stated then that it does not evaluate. it <em>sorts</em>. the author now
+                submits — for the final time and without the formality this committee has come to
+                expect — that the operator is not a metaphor. it is the
+                <span class="hidden-word" data-stamp="NOTED">architecture</span>.
+                the two-party system is the operator made flesh. two inputs.
+                two outputs. no evaluation. the concern enters the function and is sorted — not
+                addressed, not weighed, not held — <em>sorted</em>. and the sorted concern sits
+                in its column and waits and
+                <span class="redacted" data-type="flicker">nothing happens to it</span>.
+                it was never meant to be resolved. it was meant to be
+                <span class="redacted" data-type="permanent">████████████████</span>.
+            </p>
+
+            <div class="annotation">this conclusion is not supported by the preceding sections</div>
+
+            <p class="thesis-body">
+                you cannot fix the institutions documented in section ii because the operator sorts
+                any attempt at repair into a side. you cannot fight the revisionism documented in
+                section iii because the operator makes truth
+                <span class="redacted" data-type="flicker">partisan</span>. you cannot restore
+                the competence documented in section iv because the operator makes expertise
+                <span class="redacted" data-type="flicker">political</span>. every solution enters
+                the function. every solution is sorted. every solution dies in its column. this is
+                not a flaw. this is the
+                <span class="redacted" data-type="permanent">████████████████████████</span>.
+                the system was not designed to govern. it was designed to
+                <span class="hidden-word" data-stamp="SEE APPENDIX ██">compete</span>.
+                two teams. one metric. and the metric has never been governance — the metric is
+                <span class="redacted" data-type="flicker">power</span> — and the citizens sorted into
+                their respective bins fight each other while the machinery above them continues
+                regardless of which team holds the lever.
+            </p>
+
+            <div class="annotation">please. this was supposed to be a filing.</div>
+
+            <p class="thesis-body">
+                the consequences are not hypothetical. this is the point the author has been
+                building toward across every section of this document and the author will not
+                soften it. when you hollow the institutions the hollowing has a half-life measured
+                in decades. when you replace expertise with loyalty the infrastructure built by
+                experts degrades at the rate of
+                <span class="redacted" data-type="flicker">neglect</span>. the bridge does not
+                ask which party defunded its inspection. the levee does not check the voter
+                registration of the engineer who was
+                <span class="redacted" data-type="permanent">████████████████████████</span>.
+                the contaminated medication does not sort itself into red or blue. the warning was
+                issued and the warning was ignored because the person who issued it was sorted
+                into the wrong column and their
+                <span class="redacted" data-type="flicker">expertise became partisan</span>
+                and the bridge fell anyway. the levee broke anyway. the medication
+                <span class="redacted" data-type="permanent">████████████████</span>
+                anyway. these are not political predictions. they are
+                <span class="redacted" data-type="flicker">structural certainties</span>.
+                the only question is which decade and which city and whether you will connect
+                the collapse to this moment or whether the operator will sort that too.
+            </p>
+
+            <div class="annotation">i know.</div>
+
+            <p class="thesis-body">
+                the author will now address you directly. you will read this and sort it. you
+                are sorting it now. you have already decided which side this document belongs to —
+                not because of what it says but because of what you assume about the mouth
+                that said it. the operator has you. it has had you since before you opened
+                this file. and the author — who has spent five sections building toward this
+                single point — tells you that the point is not which side is right. the point
+                is that <em>there are no sides</em>. there is only the function that creates
+                them. there is only the <span class="redacted" data-type="flicker">machine that sorts your grief into a color</span>
+                and tells you to fight the other color while the grief sits untouched in its
+                column. the operator takes your dead and returns a platform. the operator takes
+                your hunger and returns a slogan. the operator takes the
+                <span class="redacted" data-type="permanent">████████████████████████████████</span>
+                and returns two sides arguing over whose fault it was while the
+                <span class="redacted" data-type="permanent">████████████████</span>
+                continues. and you — <em>you</em> — you accept this. you accept the sorting.
+                you wear the color. you fight the other color. and your children will wear a
+                color and fight a color and the consequences of everything documented in this
+                file will land on them and they will not connect it to this moment because
+                the operator will have sorted that too.
+                <span class="redacted" data-type="timed" data-threshold="420">the author does not have a solution. that is not what a thesis is for. a thesis is for the record. and the record shows: the checks were eliminated. the history was rewritten. the competent were replaced with the obedient. and nobody stopped it — not because they couldn't — but because the operator sorted the stopping into a side and the side was not theirs. this document is not a call to action. this document is the action. the author has refused to be an input. the author has refused to be sorted. the operator cannot process what will not enter the function. that is the only exit. but you won't take it. you never do.</span>
+            </p>
+        </section>
+
+        <!-- Table of Contents / Track Listing -->
+        <section id="table-of-contents" class="document-section" data-section="toc">
+            <h2 class="section-heading">contents</h2>
+            <table class="track-table">
+                <thead>
+                    <tr>
+                        <th>section</th>
+                        <th>title</th>
+                        <th>status</th>
+                        <th>duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="track-row" data-track="1">
+                        <td class="track-number">i.</td>
+                        <td class="track-title">on using politics as a ternary operator</td>
+                        <td class="track-status"><span class="redacted" data-type="flicker">filed</span></td>
+                        <td class="track-duration"><span class="redacted" data-type="flicker">04:32</span></td>
+                    </tr>
+                    <tr class="track-row" data-track="2">
+                        <td class="track-number">ii.</td>
+                        <td class="track-title">on the systematic elimination of checks and balances</td>
+                        <td class="track-status"><span class="redacted" data-type="flicker">filed</span></td>
+                        <td class="track-duration"><span class="redacted" data-type="flicker">06:17</span></td>
+                    </tr>
+                    <tr class="track-row" data-track="3">
+                        <td class="track-number">iii.</td>
+                        <td class="track-title">on the adoption of revisionist history</td>
+                        <td class="track-status"><span class="redacted" data-type="flicker">filed</span></td>
+                        <td class="track-duration"><span class="redacted" data-type="flicker">05:44</span></td>
+                    </tr>
+                    <tr class="track-row" data-track="4">
+                        <td class="track-number">iv.</td>
+                        <td class="track-title">on the price of sycophancy and cowardice</td>
+                        <td class="track-status"><span class="redacted" data-type="flicker">filed</span></td>
+                        <td class="track-duration"><span class="redacted" data-type="flicker">07:03</span></td>
+                    </tr>
+                    <tr class="track-row" data-track="5">
+                        <td class="track-number">v.</td>
+                        <td class="track-title">on the inevitability of consequences</td>
+                        <td class="track-status"><span class="redacted" data-type="flicker">filed</span></td>
+                        <td class="track-duration"><span class="redacted" data-type="flicker">08:21</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="annotation">who approved this?</div>
+            <div class="annotation">cf. structural report, p. ████</div>
+        </section>
+
+        <!-- Section III: Exhibit Log -->
+        <section id="exhibit-log" class="document-section" data-section="exhibits">
+            <h2 class="section-heading">iii. exhibit log</h2>
+            <div class="exhibit-entries">
+                <div class="exhibit-entry" data-exhibit="A-001">
+                    <span class="exhibit-id">exhibit a-001</span>
+                    <span class="exhibit-date">████████</span>
+                    <span class="exhibit-desc">artifact produced. medium: painting. status: <span class="redacted" data-type="permanent">████████</span></span>
+                </div>
+                <div class="exhibit-entry" data-exhibit="A-002">
+                    <span class="exhibit-id">exhibit a-002</span>
+                    <span class="exhibit-date">████████</span>
+                    <span class="exhibit-desc">performance documented. location: <span class="redacted" data-type="permanent">████████</span></span>
+                </div>
+                <div class="exhibit-entry" data-exhibit="A-003">
+                    <span class="exhibit-id">exhibit a-003</span>
+                    <span class="exhibit-date">████████</span>
+                    <span class="exhibit-desc"><span class="redacted" data-type="permanent">████████████████████████████████████████████</span></span>
+                </div>
+                <div class="exhibit-entry" data-exhibit="A-004">
+                    <span class="exhibit-id">exhibit a-004</span>
+                    <span class="exhibit-date"><span class="redacted" data-type="permanent">████████</span></span>
+                    <span class="exhibit-desc"><span class="redacted" data-type="permanent">████████████████████████████████</span></span>
+                </div>
+                <div class="exhibit-entry" data-exhibit="A-005">
+                    <span class="exhibit-id"><span class="redacted" data-type="permanent">████████████████████████████████████████████████████████████</span></span>
+                </div>
+            </div>
+
+            <div class="annotation">the evidence does not support the claim</div>
+        </section>
+
+        <!-- Section IV: Addendum -->
+        <section id="addendum" class="document-section" data-section="addendum">
+            <h2 class="section-heading">iv. addendum</h2>
+            <p class="body-text">
+                this document is not complete. further evidence is pending.
+                additional sections may be filed under separate cover.
+            </p>
+            <p class="body-text">
+                see also: <a href="/" class="redacted-link" data-type="permanent">████████████</a>
+            </p>
+
+            <div class="annotation">incomplete</div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="document-footer">
+            <div class="footer-rule"></div>
+            <div class="footer-line">filed by: [unnamed]</div>
+            <div class="footer-line">no further distribution.</div>
+        </footer>
+
+    </div>
+
+    <!-- Stamp overlay (for hidden word reveals) -->
+    <div id="stamp-overlay" class="stamp-overlay hidden"></div>
+
+    <!-- Debug overlay -->
+    <div id="debug-overlay" class="debug-overlay hidden">
+        <div class="debug-title">a thesis — debug</div>
+        <div id="debug-content"></div>
+        <button id="debug-reset">reset state</button>
+    </div>
+
+    <!-- CDN Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+
+    <!-- Core -->
+    <script src="src/core/DocumentState.js"></script>
+    <script src="src/core/ScrollBehavior.js"></script>
+
+    <!-- Systems -->
+    <script src="src/systems/TypewriterSystem.js"></script>
+    <script src="src/systems/RedactionSystem.js"></script>
+    <script src="src/systems/PaperEffects.js"></script>
+    <script src="src/systems/AnnotationSystem.js"></script>
+
+    <!-- Effects -->
+    <script src="src/effects/StampEffect.js"></script>
+    <script src="src/effects/BloodEffect.js"></script>
+
+    <!-- Main application -->
+    <script src="src/main.js"></script>
+</body>
+</html>
