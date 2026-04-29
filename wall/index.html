@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Witness Wall</title>
+
+    <!-- Ensure trailing slash so relative paths resolve correctly -->
+    <script>
+        if (!window.location.pathname.endsWith('/') && !window.location.pathname.includes('.')) {
+            window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+        }
+    </script>
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            background: #000;
+            color: #e0e0e0;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Init overlay */
+        #init-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        #init-overlay.dismissed {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.2s ease;
+        }
+        .init-text {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            letter-spacing: 6px;
+            text-transform: lowercase;
+            color: #666;
+            animation: initPulse 4s ease-in-out infinite;
+        }
+        @keyframes initPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Debug overlay */
+        .debug-overlay {
+            position: fixed;
+            top: 10px; left: 10px;
+            background: rgba(0,0,0,0.9);
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            padding: 12px;
+            z-index: 9999;
+            max-width: 300px;
+            line-height: 1.5;
+            border: 1px solid #00ff00;
+        }
+        .hidden { display: none !important; }
+    </style>
+
+    <link rel="stylesheet" href="styles/wall.css">
+</head>
+<body>
+
+    <!-- Init overlay -->
+    <div id="init-overlay">
+        <span class="init-text">remember</span>
+    </div>
+
+    <!-- Particle canvas (behind text) -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Search bar -->
+    <div id="search-container" class="hidden">
+        <input type="text" id="search-input" placeholder="search records..." autocomplete="off" spellcheck="false">
+        <div id="search-result" class="hidden"></div>
+    </div>
+
+    <!-- Scroll container (virtual scroll target) -->
+    <div id="wall-container" class="hidden">
+        <div id="wall-spacer"></div>
+        <div id="wall-viewport"></div>
+    </div>
+
+    <!-- Depth indicator -->
+    <div id="depth-indicator" class="hidden"></div>
+
+    <!-- Debug overlay -->
+    <div id="debug-overlay" class="debug-overlay hidden">
+        <div class="debug-title">witness wall &mdash; debug</div>
+        <div id="debug-content"></div>
+        <button id="debug-reset">reset state</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="src/core/PRNG.js"></script>
+    <script src="src/core/WallState.js"></script>
+    <script src="src/systems/DepthEngine.js"></script>
+    <script src="src/systems/VirtualScroll.js"></script>
+    <script src="src/systems/SearchSystem.js"></script>
+    <script src="src/effects/ParticleSystem.js"></script>
+    <script src="src/effects/WallAudio.js"></script>
+    <script src="src/effects/CrossSiteEffects.js"></script>
+    <script src="src/main.js"></script>
+
+</body>
+</html>
